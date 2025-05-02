@@ -108,10 +108,10 @@ io.on('connection', (socket) => {
   });
 });
 
-// Express routes
-app.get('/', (req, res) => {
-  res.render('index');
+app.get('/health', (req, res) => {
+  res.status(200).send('Server is running');
 });
+
 
 app.get('/call', (req, res) => {
   res.redirect(`call/${uuid4()}`);

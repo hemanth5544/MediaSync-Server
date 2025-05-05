@@ -21,11 +21,15 @@ const userMap = new Map(); // socket.id -> username
 const rooms = new Map(); // call_id -> Map(socket.id -> username)
 
 io.on('connection', (socket) => {
-  socket.on('set-username', (username) => {
+  socket.on('set-username', (data) => {
+    // Handle both string format and object format
+    const username = typeof data === 'string' ? data : data.username;
     console.log('Received username:', username, 'for socket:', socket.id);
+    
+    // Store the username in the map
     userMap.set(socket.id, username);
   });
-
+  
   socket.on('join-call', (call_id) => {
     socket.join(call_id);
 
@@ -82,9 +86,17 @@ io.on('connection', (socket) => {
 
   // StreamChat
   socket.on('chat-message', (data) => {
-    io.to(data.to).emit('brodcast-message', { message: data.message, from: socket.id });
+    // Get the username from the userMap or use socket ID as fallback
+    const username = userMap.get(socket.id) || `User-${socket.id.slice(0, 4)}`;
+    
+    // Broadcast the message with the proper username
+    io.to(data.to).emit('brodcast-message', { 
+      message: data.message, 
+      from: username  // Use the username instead of socket.id
+    });
+    
+    console.log(`Message from ${username}: ${data.message}`);
   });
-
   // One-One chat
   socket.on('personal-chat', (data) => {
     const username = userMap.get(socket.id); // Get the username from the userMap

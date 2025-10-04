@@ -147,4 +147,4 @@ app.get('/stream/:stream_id', (req, res) => {
   res.render('stream', data);
 });
 
-server.listen(2000, () => console.log('Server running on port 2000'));
+server.listen(4000, () => console.log('Server running on port 2000'));
